@@ -48,9 +48,9 @@ gem "bootsnap", require: false
 # Background jobs
 gem "sidekiq"
 
-# Elasticsearch
-gem "elasticsearch-model"
-gem "elasticsearch-rails"
+# Elasticsearch (optional - can be enabled later)
+# gem "elasticsearch-model", "~> 8.0"
+# gem "elasticsearch-rails", "~> 8.0"
 
 # RabbitMQ
 gem "bunny"

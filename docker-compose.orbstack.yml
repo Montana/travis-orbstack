@@ -52,29 +52,29 @@ services:
     tmpfs:
       - /tmp:noexec,nosuid,size=100m
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - bootstrap.memory_lock=true
-    ports:
-      - "9200:9200"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 20
-    # OrbStack optimizations
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    tmpfs:
-      - /tmp:noexec,nosuid,size=200m
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #     - ES_JAVA_OPTS=-Xms512m -Xmx512m
+  #     - bootstrap.memory_lock=true
+  #   ports:
+  #     - "9200:9200"
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 20
+  #   # OrbStack optimizations
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   tmpfs:
+  #     - /tmp:noexec,nosuid,size=200m
 
   app:
     build:
@@ -84,7 +84,7 @@ services:
       DATABASE_URL: postgres://app:app@db:5432/app_test
       REDIS_URL: redis://redis:6379/0
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
-      ELASTICSEARCH_URL: http://elasticsearch:9200
+      # ELASTICSEARCH_URL: http://elasticsearch:9200
       CI: "false"
       ORBSTACK: "true"
       RAILS_ENV: development
@@ -95,8 +95,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
+      # elasticsearch:
+      #   condition: service_healthy
     volumes:
       - .:/app
       - bundle_cache:/usr/local/bundle
@@ -115,8 +115,8 @@ volumes:
     driver: local
   rabbitmq_data:
     driver: local
-  elasticsearch_data:
-    driver: local
+  # elasticsearch_data:
+  #   driver: local
   bundle_cache:
     driver: local
   node_modules_cache:

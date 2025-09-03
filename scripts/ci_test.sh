@@ -9,13 +9,13 @@ for i in {1..60}; do
   sleep 1
 done
 
-echo "[ci] waiting for elasticsearch..."
-for i in {1..60}; do
-  if curl -s http://elasticsearch:9200 >/dev/null; then
-    break
-  fi
-  sleep 2
-done
+# echo "[ci] waiting for elasticsearch..."
+# for i in {1..60}; do
+#   if curl -s http://elasticsearch:9200 >/dev/null; then
+#     break
+#   fi
+#   sleep 2
+# done
 
 echo "[ci] run migrations & rspec"
 
