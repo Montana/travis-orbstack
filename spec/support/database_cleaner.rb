@@ -3,6 +3,9 @@ require 'database_cleaner/active_record'
 
 RSpec.configure do |config|
   config.before(:suite) do
+    # Disable safeguards for CI environment
+    DatabaseCleaner.allow_remote_database_url = true if ENV['CI']
+    
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
   end
