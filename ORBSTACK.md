@@ -136,7 +136,7 @@ When running with OrbStack:
 - **Rails App**: http://localhost:3000
 - **PostgreSQL**: localhost:5432
 - **Redis**: localhost:6379
-- **RabbitMQ Management**: http://localhost:15672 (guest/guest)
+- **RabbitMQ Management**: http://localhost:15673 (guest/guest)
 - **Elasticsearch**: http://localhost:9200
 
 ## 🐛 Troubleshooting
