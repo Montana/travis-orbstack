@@ -1,0 +1,39 @@
+os: linux
+dist: focal
+language: minimal
+
+services:
+  - docker
+
+before_install:
+  - if ! docker compose version >/dev/null 2>&1; then
+      sudo mkdir -p /usr/libexec/docker/cli-plugins &&
+      sudo curl -SL "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64"         -o /usr/libexec/docker/cli-plugins/docker-compose &&
+      sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose &&
+      docker compose version;
+    fi
+
+env:
+  global:
+    - DOCKER_BUILDKIT=1
+    - COMPOSE_DOCKER_CLI_BUILD=1
+
+stages:
+  - test
+  - build
+  - name: deploy
+    if: branch = main AND type = push
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - docker compose -f docker-compose.ci.yml up --build --abort-on-container-exit --exit-code-from app
+    - stage: build
+      script:
+        - docker build -t myapp:${TRAVIS_COMMIT} -f Dockerfile.ci .
+    - stage: deploy
+      script:
+        - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+        - docker tag myapp:${TRAVIS_COMMIT} montana/travis-orbstack:${TRAVIS_COMMIT}
+        - docker push montana/travis-orbstack:${TRAVIS_COMMIT}
