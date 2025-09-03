@@ -1,4 +1,4 @@
 # Be sure to restart your server when you modify this file.
 
-# Configure Webdrivers
-Webdrivers::Chromedriver.update
+# Configure Webdrivers (commented out for CI environment)
+# Webdrivers::Chromedriver.update
