@@ -53,6 +53,7 @@ gem "sidekiq"
 
 # Required for Ruby 3.4+ (no longer included in standard library)
 gem "bigdecimal"
+gem "mutex_m"
 
 # Elasticsearch (optional - can be enabled later)
 # gem "elasticsearch-model", "~> 8.0"
