@@ -51,6 +51,9 @@ gem "bootsnap", require: false
 # Background jobs
 gem "sidekiq"
 
+# Required for Ruby 3.4+ (no longer included in standard library)
+gem "bigdecimal"
+
 # Elasticsearch (optional - can be enabled later)
 # gem "elasticsearch-model", "~> 8.0"
 # gem "elasticsearch-rails", "~> 8.0"

@@ -66,6 +66,7 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    bigdecimal (3.1.4)
     bootsnap (1.18.0)
       msgpack (~> 1.2)
     brakeman (6.2.0)
@@ -231,6 +232,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bigdecimal
   bootsnap (>= 1.4.4)
   brakeman
   bunny
