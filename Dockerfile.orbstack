@@ -1,0 +1,50 @@
+# OrbStack-optimized Dockerfile for development
+FROM ruby:3.4-slim
+
+WORKDIR /app
+
+# Install system dependencies optimized for OrbStack
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    postgresql-client \
+    curl \
+    gnupg \
+    bash \
+    git \
+    vim \
+    htop \
+    libpq-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and Yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn
+
+# Copy Gemfile and install gems
+COPY Gemfile Gemfile.lock* /app/
+RUN bundle config set --local deployment 'false' && \
+    bundle install --jobs=4 --retry=3
+
+# Copy application code
+COPY . /app
+
+# Make scripts executable
+RUN chmod +x /app/scripts/*.sh
+
+# Create necessary directories
+RUN mkdir -p tmp/pids tmp/cache tmp/sockets log storage
+
+# Set up OrbStack-specific environment
+ENV ORBSTACK=true
+ENV RAILS_ENV=development
+ENV BUNDLE_PATH=/usr/local/bundle
+
+# Expose port
+EXPOSE 3000
+
+# Default command for development
+CMD ["bash", "-lc", "bundle exec rails server -b 0.0.0.0"]

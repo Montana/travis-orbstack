@@ -18,12 +18,14 @@ for i in {1..60}; do
 done
 
 echo "[ci] run migrations & rspec"
-bundle install --jobs=3 --retry=3
 
 # Set database environment variables for Rails to use the container setup
 export DB_HOST=db
 export DB_USERNAME=app
 export DB_PASSWORD=app
+
+# Ensure gems are installed (they should be from Docker build)
+bundle check || bundle install --jobs=3 --retry=3
 
 # Create and migrate the test database
 bundle exec rails db:create RAILS_ENV=test

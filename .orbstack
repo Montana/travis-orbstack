@@ -1,0 +1,25 @@
+# OrbStack configuration file
+# This file configures OrbStack-specific settings for the project
+
+# Enable OrbStack features
+enable_gpu=false
+enable_networking=true
+enable_volumes=true
+
+# Resource allocation
+memory=4G
+cpus=4
+
+# Network configuration
+network_mode=bridge
+
+# Volume mounts
+volumes:
+  - ./tmp:/app/tmp
+  - ./log:/app/log
+  - ./storage:/app/storage
+
+# Environment variables for OrbStack
+environment:
+  - ORBSTACK=true
+  - DOCKER_HOST=unix:///Users/michael/.orbstack/run/docker.sock

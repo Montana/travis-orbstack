@@ -1,0 +1,123 @@
+# OrbStack-optimized Docker Compose configuration
+# This configuration is optimized for OrbStack performance and features
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app_test
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./tmp:/tmp
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    # OrbStack optimizations
+    shm_size: 256mb
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    volumes:
+      - redis_data:/data
+    # OrbStack optimizations
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    tmpfs:
+      - /tmp:noexec,nosuid,size=50m
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_VHOST: /
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # OrbStack optimizations
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - bootstrap.memory_lock=true
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    # OrbStack optimizations
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    tmpfs:
+      - /tmp:noexec,nosuid,size=200m
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.orbstack
+    environment:
+      DATABASE_URL: postgres://app:app@db:5432/app_test
+      REDIS_URL: redis://redis:6379/0
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      CI: "false"
+      ORBSTACK: "true"
+      RAILS_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules_cache:/app/node_modules
+    ports:
+      - "3000:3000"
+    # OrbStack optimizations
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    command: ["bash", "-lc", "bundle exec rails server -b 0.0.0.0"]
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  bundle_cache:
+    driver: local
+  node_modules_cache:
+    driver: local
